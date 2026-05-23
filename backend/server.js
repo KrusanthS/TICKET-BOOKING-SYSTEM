@@ -127,16 +127,25 @@ app.get('/api/health', (req, res) => {
 });
 
 // Serve frontend static files if built (works in production on Render)
-const frontendDist = path.join(__dirname, '../frontend/dist');
-if (fs.existsSync(frontendDist)) {
+const possiblePaths = [
+  path.join(__dirname, '../frontend/dist'),
+  path.join(process.cwd(), 'frontend/dist'),
+  path.join(process.cwd(), 'dist')
+];
+
+console.log('🔍 __dirname:', __dirname);
+console.log('🔍 cwd:', process.cwd());
+possiblePaths.forEach(p => console.log(`🔍 Checking: ${p} → exists: ${fs.existsSync(p)}`));
+
+const frontendDist = possiblePaths.find(p => fs.existsSync(p));
+if (frontendDist) {
   console.log(`✅ Serving frontend from: ${frontendDist}`);
-  app.use(express.static(frontendDist, { maxAge: '1d' }));
-  // Catch-all: serve index.html for any non-API route (SPA support)
+  app.use(express.static(frontendDist));
   app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(frontendDist, 'index.html'));
   });
 } else {
-  console.warn(`⚠️ Frontend dist not found at: ${frontendDist}`);
+  console.warn('⚠️ Frontend dist not found in any known path. Only API is available.');
 }
 
 // Global Error Handlers (only for /api routes)
