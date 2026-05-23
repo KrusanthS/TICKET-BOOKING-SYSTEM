@@ -10,5 +10,17 @@ export default defineConfig({
       '/api': { target: 'http://localhost:5001', changeOrigin: true },
       '/uploads': { target: 'http://localhost:5001', changeOrigin: true }
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['framer-motion', 'lucide-react', 'recharts'],
+          'utils-vendor': ['axios', 'socket.io-client', 'date-fns', 'react-hook-form']
+        }
+      }
+    }
   }
 });
