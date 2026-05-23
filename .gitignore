@@ -4,6 +4,8 @@ node_modules/
 
 # Environment variables
 .env
+*.env
+_.env
 backend/.env
 frontend/.env
 frontend/.env.local
