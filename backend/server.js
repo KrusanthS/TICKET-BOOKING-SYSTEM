@@ -129,15 +129,18 @@ app.get('/api/health', (req, res) => {
 // Serve frontend static files if built (works in production on Render)
 const frontendDist = path.join(__dirname, '../frontend/dist');
 if (fs.existsSync(frontendDist)) {
-  app.use(express.static(frontendDist));
+  console.log(`✅ Serving frontend from: ${frontendDist}`);
+  app.use(express.static(frontendDist, { maxAge: '1d' }));
   // Catch-all: serve index.html for any non-API route (SPA support)
   app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(frontendDist, 'index.html'));
   });
+} else {
+  console.warn(`⚠️ Frontend dist not found at: ${frontendDist}`);
 }
 
-// Global Error Handlers (Applicable to both Dev and Prod)
-app.use(notFound);
+// Global Error Handlers (only for /api routes)
+app.use('/api', notFound);
 app.use(errorHandler);
 
 // Connect DB and Start Services
